@@ -18,7 +18,12 @@ public class ControlCenter {
     @StudentImplementationRequired("H3.1.1")
     public ScanRobot[] initScanRobots() {
         // TODO: H3.1.1
-        return org.tudalgo.algoutils.student.Student.crash("H3.1.1 - Remove if implemented");
+        ScanRobot[] scanRobotArray = new ScanRobot[World.getWidth()-1];
+        for (int i = 0; i < scanRobotArray.length; i++)
+            scanRobotArray[i]=new ScanRobot(i,0,Direction.UP,0);
+
+        return scanRobotArray;
+        //return org.tudalgo.algoutils.student.Student.crash("H3.1.1 - Remove if implemented");
     }
 
     /**
@@ -29,7 +34,12 @@ public class ControlCenter {
     @StudentImplementationRequired("H3.1.2")
     public CleanRobot[] initCleaningRobots() {
         // TODO: H3.1.2
-        return org.tudalgo.algoutils.student.Student.crash("H3.1.2 - Remove if implemented");
+        CleanRobot[] cleanRobotArray = new CleanRobot[World.getHeight()-1];
+        for (int i = 0; i < cleanRobotArray.length; i++) {
+            cleanRobotArray[i] = new CleanRobot(World.getWidth()-1,World.getHeight()-1-i,Direction.LEFT,0);
+        }
+        return cleanRobotArray;
+        //return org.tudalgo.algoutils.student.Student.crash("H3.1.2 - Remove if implemented");
     }
 
     /**
@@ -40,7 +50,13 @@ public class ControlCenter {
     @StudentImplementationRequired("H3.2")
     public void placeCoinsInWorld(int[][] coins) {
         // TODO: H3.2
-        org.tudalgo.algoutils.student.Student.crash("H3.2 - Remove if implemented");
+        for (int y = 1; y < coins.length; y++) {
+            for (int x = 1; x < coins[y].length; x++) {
+                World.putCoins(x,y,coins[y][x]);
+            }
+        }
+
+        //org.tudalgo.algoutils.student.Student.crash("H3.2 - Remove if implemented");
     }
 
     /**
@@ -52,9 +68,25 @@ public class ControlCenter {
     @StudentImplementationRequired("H3.3.1")
     public void reverseRobots(Robot[] robots) {
         // TODO: H3.3.1
-        org.tudalgo.algoutils.student.Student.crash("H3.3.1 - Remove if implemented");
+        int leftIndex = 0;
+        int rightIndex = robots.length-1;
+        Robot tempRobot = robots[0];
+        while (leftIndex<rightIndex){
+            robots[leftIndex]=robots[rightIndex];
+            robots[rightIndex]=tempRobot;
+            tempRobot=robots[leftIndex+1];
+            leftIndex++;
+            rightIndex--;
+        }
+
+        //org.tudalgo.algoutils.student.Student.crash("H3.3.1 - Remove if implemented");
     }
 
+
+    private void turn180(Robot robot){
+        robot.turnLeft();
+        robot.turnLeft();
+    }
     /**
      * Rotates the {@linkplain Robot robots} in the given array in ascending order.
      *
@@ -63,7 +95,9 @@ public class ControlCenter {
     @StudentImplementationRequired("H3.3.2")
     public void rotateRobots(Robot[] robots) {
         // TODO: H3.3.2
-        org.tudalgo.algoutils.student.Student.crash("H3.3.2 - Remove if implemented");
+        for(Robot robot: robots)
+            turn180(robot);
+        //org.tudalgo.algoutils.student.Student.crash("H3.3.2 - Remove if implemented");
     }
 
     /**
@@ -74,7 +108,10 @@ public class ControlCenter {
     @StudentImplementationRequired("H3.3.3")
     public void moveRobotsToEnd(Robot[] robots) {
         // TODO: H3.3.3
-        org.tudalgo.algoutils.student.Student.crash("H3.3.3 - Remove if implemented");
+        for(Robot robot: robots)
+            while (robot.isFrontClear())
+                robot.move();
+        //org.tudalgo.algoutils.student.Student.crash("H3.3.3 - Remove if implemented");
     }
 
     /**
@@ -87,7 +124,12 @@ public class ControlCenter {
     @StudentImplementationRequired("H3.3.4")
     public void restoreRobots(Robot[] robots) {
         // TODO: H3.3.4
-        org.tudalgo.algoutils.student.Student.crash("H3.3.4 - Remove if implemented");
+        reverseRobots(robots);
+        rotateRobots(robots);
+        moveRobotsToEnd(robots);
+        reverseRobots(robots);
+        rotateRobots(robots);
+        //org.tudalgo.algoutils.student.Student.crash("H3.3.4 - Remove if implemented");
     }
 
 
@@ -100,7 +142,20 @@ public class ControlCenter {
     @StudentImplementationRequired("H3.4.1")
     public boolean[][] scanWorld(ScanRobot[] scanRobots) {
         // TODO: H3.4.1
-        return org.tudalgo.algoutils.student.Student.crash("H3.4.1 - Remove if implemented");
+        boolean[][] coinPositions = new boolean[World.getHeight()][World.getWidth()];
+        for(boolean[] y: coinPositions)
+            for(boolean x: y)
+                x=false;
+        for (int y = 0; y < World.getHeight(); y++) {
+            for(ScanRobot scanRobot: scanRobots){
+                if (scanRobot.isOnACoin())
+                    coinPositions[scanRobot.getY()][scanRobot.getX()] = true;
+                if (scanRobot.isFrontClear())
+                    scanRobot.move();
+            }
+        }
+        return coinPositions;
+        //return org.tudalgo.algoutils.student.Student.crash("H3.4.1 - Remove if implemented");
     }
 
     /**
@@ -112,7 +167,10 @@ public class ControlCenter {
     @StudentImplementationRequired("H3.4.2")
     public boolean[][] moveScanRobots(ScanRobot[] scanRobots) {
         // TODO: H3.4.2
-        return org.tudalgo.algoutils.student.Student.crash("H3.4.2 - Remove if implemented");
+        boolean[][] output = scanWorld(scanRobots);
+        restoreRobots(scanRobots);
+        return output;
+        //return org.tudalgo.algoutils.student.Student.crash("H3.4.2 - Remove if implemented");
     }
 
     /**
@@ -124,7 +182,8 @@ public class ControlCenter {
     @StudentImplementationRequired("H3.4.3")
     public void cleanWorld(CleanRobot[] cleanRobots, boolean[][] coinPositions) {
         // TODO: H3.4.3
-        org.tudalgo.algoutils.student.Student.crash("H3.4.3 - Remove if implemented");
+
+        //org.tudalgo.algoutils.student.Student.crash("H3.4.3 - Remove if implemented");
     }
 
     /**
